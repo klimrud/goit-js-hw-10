@@ -1,0 +1,2 @@
+const e=document.getElementById("search-box"),t=document.querySelector(".country-list");document.querySelector(".country-info");e.addEventListener("input",(function(e){e.preventDefault(),t.textContent=e.currentTarget.value;const n=e.currentTarget.value.trim();(o=n,fetch(`https://restcountries.com/v2/name/${o}`).then((e=>e.json())).then((e=>{console.log(e)})).catch((e=>{console.log("error:Oops, there is no country with that name")}))).then((()=>{console.log(n)})).catch((function(e){console.log(e)})).finally((()=>n.reset()));var o}));
+//# sourceMappingURL=index.fb1d0060.js.map
