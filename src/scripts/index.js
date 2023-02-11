@@ -1,61 +1,80 @@
 import '../css/styles.css';
 import fetchCountries from './api.js'
-// import lodash from 'lodash.debounce';
-// import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import debounce from 'lodash.debounce';
+//  import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import Notiflix from 'notiflix';
 const DEBOUNCE_DELAY = 300;
 
-
+// fetchCountries("Canada").then(console.log);
 const inputEl = document.getElementById('search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
-// console.log(inputEl);
-// console.log(countryList);
-// console.log(countryInfo);
 
-// inputEl.addEventListener('click', onClick)
-inputEl.addEventListener('input', onInputChange)
+   inputEl.addEventListener('input', debounce(onInputChange, DEBOUNCE_DELAY))
+//  inputEl.addEventListener('input', onInputChange);
+
 function onInputChange(e) {
-    e.preventDefault();
-//   console.log(e.currentTarget.elements);
-  countryList.textContent = e.currentTarget.value
-  const input = e.currentTarget.value.trim();
-  fetchCountries(input).then(() =>{
-    // if ([{}].length === 0) throw new Error('no country');
-    console.log(input);
-    // return articles.reduce((markup,article) =>
-    // createMarkup(article) + markup, '');
+ e.preventDefault();
+//  console.log('sos');
+ let inpValue = '';
+ countryInfo.innerHTML = '';
+ countryList.innerHTML = '';
+  inpValue = e.target.value.trim();
+  if (inpValue.length === 0){
+    return Notiflix.Notify.info("no country");}
 
-//   }).then(markup => {
-//     console.log(markup);
-  }).catch (onError)
-  .finally(() => input.reset());
-
-
-function createMarkup({name, capital, population, flags, languages} ){
-// name.official - повна назва країни
-// capital - столиця
-// population - населення
-// flags.svg - посилання на зображення прапора
-// languages 
-
-//   return `
-//   <svg>
-//   <use ${flags.svg}></use>
-// </svg> 
-//  <h2 class="country- title">${name}</h2>;
-//  <p class="country-capital">${capital}</p>;
-//  <p class="country-population">${population}</p>;
-//  <p class="country-languages">${languages}</p>;`
+  fetchCountries(inpValue).then((data) =>{
+    if (data.length === 1 ) {
+        creatCountry(data);
+       } else if (data.length > 1 && data.length <= 10 ){
+        //   console.log('bu')
+        //  console.log(data)
+         creatCard(data); 
+       } else {
+          Notiflix.Notify.info("Too many matches found. Please enter a more specific name.")
+       };
+       
+}).catch(onError)
 }
 
-   function onError(err){
-    console.log(err)
-  }
+function creatCard(data) { 
+  const markup = data.map(
+      ({ name, flags }) => 
+      `<li class="country-item">
+      <h2 class="country_title">
+      <img class="country-item" src="${flags.svg}" alt="${flags.alt}"  width="30"/>
+      ${name.official}</h2>
+    </li>`  
+       ).join('');
+      //  console.log(markup)
+       countryList.innerHTML = markup;
+ };
 
-//    console.log(input);
-//    console.log();
-//    console.log('hi');
+ function creatCountry(data) {
+  const [{name, flags, capital, population, languages}] = data      
+  countryList.innerHTML = 
+      `<li class="country-item">
+            <h2 class="country_title">
+             <img class="country-item" src="${flags.svg}" alt="${flags.alt}" width="30"/>
+             ${name.official}</h2>
+      </li>`  
+    countryInfo.innerHTML =
+    `
+        <p><b>Capital:</b>  ${capital}</p>
+        <p><b>Population:</b>  ${population}</p>
+        <p><b>Languages:</b>  ${Object.values(languages).join(', ')}</p>
+    `
 };
+
+// 
+   function onError(err) {
+    Notiflix.Notify.failure("Oops, there is no country with that name")
+ };
+
+
+
+
+
 
 // fetchCountries('peru').then(console.log);
 
@@ -63,11 +82,11 @@ function createMarkup({name, capital, population, flags, languages} ){
 // fetchCountries.js
 // fetchCountries(name)
 
-// name.official - повна назва країни
-// capital - столиця
-// population - населення
-// flags.svg - посилання на зображення прапора
-// languages - масив мов
+// // name.official - повна назва країни
+// // capital - столиця
+// // population - населення
+// // flags.svg - посилання на зображення прапора
+// // languages 
 // ------
 // Для повідомлень використовуй бібліотеку notiflix 
 // і виводь такий рядок "Too many matches found. Please enter a more specific name.".

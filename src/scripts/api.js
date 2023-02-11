@@ -1,18 +1,12 @@
 
-
-
-
-function fetchCountries(query){
-    const URL = `https://restcountries.com/v2/name/${query}`
+function fetchCountries(name){
+    const URL = `https://restcountries.com/v3.1/name/${name}`
     return fetch(URL)
-    .then(response => {
-        // console.log(response.json());
-        return response.json();
-    }).then(data =>{
-        console.log(data);
-    }).catch(error =>{
-        console.log('error:Oops, there is no country with that name' );
-    });
-}
+    .then(res => { 
+         if (!res.ok) { throw new Error("Oops, there is no country with that name")};
+        //  console.log(response.json());
+        return res.json();
+    })
+ }
 
 export default fetchCountries;  
